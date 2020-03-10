@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "422542307484",
+    "firebase_url": "https://mymoto-7da35.firebaseio.com",
+    "project_id": "mymoto-7da35",
+    "storage_bucket": "mymoto-7da35.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422542307484:android:63280b01f784faf2bb7d59",
+        "android_client_info": {
+          "package_name": "com.example.MyMoto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "422542307484-c0ck4p6qe4drcrjmu9q1nfkub13cgtqe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDALjKY64Gc2n-MMVM9Den0f3wU2etZnyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "422542307484-c0ck4p6qe4drcrjmu9q1nfkub13cgtqe.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "422542307484-9gu6o8mnlmhmkmtkgau8u8ttdug0irod.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "My.Moto"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
