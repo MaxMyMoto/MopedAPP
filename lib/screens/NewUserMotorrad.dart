@@ -1,3 +1,4 @@
+import 'package:MyMoto/screens/NewUserMotorradSonstiges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class NewUserMotorrad extends StatefulWidget {
 
 class _NewUserMotorradState extends State<NewUserMotorrad> {
   final MarkeController = TextEditingController();
+  final MarkenController = TextEditingController();
   FirebaseUser user;
   String error;
   //.
@@ -49,29 +51,11 @@ class _NewUserMotorradState extends State<NewUserMotorrad> {
     MarkeController.dispose();
     super.dispose();
 
+    MarkenController.dispose();
+    super.dispose();
+
 
   }
-
-  //Widget modelAuswahl(String string) {
-  //  if(string == '/')
-  //    YamahaCodePicker(    textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
-  //       showOnlyYamahaWhenClosed: true,
-  //       showYamahaOnly: true, //eg. 'GBP'
-  //       );
-  //  if(string =='Yamaha' )
-  //    YamahaCodePicker(
-  //       textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
-  //       showOnlyYamahaWhenClosed: true,
-  //        showYamahaOnly: true, //eg. 'GBP'
-  //       );
-  //  if(string =='Ducati')
-  //    DucatiCodePicker(
-  //       textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
-  //        showOnlyDucatiWhenClosed: true,
-  //        showDucatiOnly: true, //eg. 'GBP'
-//        );
-  // }
-
 
 
   void _updateMotorradMarkeData(String string) async {
@@ -91,17 +75,45 @@ class _NewUserMotorradState extends State<NewUserMotorrad> {
     });
 
   }
+  void _updateMotorradSontiges(String string) async {
+
+    final FirebaseUser user = await _auth.currentUser();
+    final uid = user.uid;
+
+
+    await databaseReference.collection("Users")
+        .document(uid)
+    .collection("NutzerDaten")
+    .document("Motorrad")
+        .setData({
+
+      'MotorradMarke': string,
+
+
+
+    });
+    await databaseReference.collection("Users")
+        .document(uid)
+        .updateData({
+
+      'MotorradModell': "/",
+      'MotorradBaujahr' : "/",
+
+
+
+    });
+  }
 
   
   @override
   Widget build(BuildContext context) {
-setState(() {
-
-});
     return Scaffold(
       body:
       Container(
-        color: Color(0xff272727),
+        color: Color(0xff272727), height: MediaQuery.of(context).size.height,
+    child:
+    SingleChildScrollView(
+
         child: SafeArea(child: Column(
           children: <Widget>[
             SizedBox(height: kToolbarHeight/2,),
@@ -140,9 +152,10 @@ setState(() {
                 textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
                 showOnlyMarkenWhenClosed: true,
                 showMarkenOnly: true, //eg. 'GBP'
-                initialSelection: ('Sonstiges'),
+                initialSelection: ('Auswählen'),
                 onChanged: (e) {
                   _updateMotorradMarkeData(e.toMarkenStringOnly());
+                  MarkeController.text = e.toMarkenStringOnly();
 
 
                 }
@@ -151,37 +164,142 @@ setState(() {
             SizedBox(
               height: (kToolbarHeight / 2),
             ),
-            Center(
-              child: SizedBox(
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.white)),
-                  color: Color(0xf272727),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NewUserMotorradModell()),
-                    );
-                  },
-                  child: Text(
-                    "Weiter",
-                    style: TextStyle(
-                        fontFamily: 'texgyreadventors',
-                        fontSize: 28,
-                        color: Colors.white),
-                  ),
-                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                ),
-              ),
-            )
+            user != null ? _buildKetting(context) : Text(
+                "Error: $error"),
           ],
         )),
       )
-      ,
+      ,)
     );
   }
 
+  Widget _buildKetting(BuildContext context) {
+    return new StreamBuilder(
+        stream: Firestore.instance.collection('Users')
+            .document(user.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return new Text("Loading");
+          }
+          var userDocument = snapshot.data;
+          return new Padding(padding:EdgeInsets.only(left: 30, right: 30),
+              child:
+              Center(child:
+              _WeiterButton(userDocument['MotorradMarke']),
+              )
+          );
+        });
+  }
 
+  Widget _WeiterButton(String string) {
+    if(string == "Sonstiges")
+      return Column(children: <Widget>[
+        Text("Gebe deine Motorrad-Marke ein",style: TextStyle(fontFamily: 'Texgyreadventors',fontSize: 20, color: Colors.white70),),
+        SizedBox(
+          height: (kToolbarHeight / 2),
+        ),
+        TextFormField(
+          controller: MarkenController,
+          style: TextStyle(
+              fontFamily: 'texgyreadventors',
+              fontSize: 22,
+              color: Colors.white),
+          decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.white,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.white,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            hintText: "Marke",
+            hintStyle: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 22,
+                color: Colors.white70),
+          ),
+        ),
+        SizedBox(
+          height: (kToolbarHeight / 2),
+        ),
+        SizedBox(
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+            side: BorderSide(color: Colors.white)),
+        color: Color(0xf272727),
+        onPressed: () {_onPressed();
+        },
+        child: Text(
+          "Weiter",
+          style: TextStyle(
+              fontFamily: 'texgyreadventors',
+              fontSize: 28,
+              color: Colors.white),
+        ),
+        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+      ),
+    ),
+      ],);
+    if(string == "/" || string == "Auswählen")
+      return SizedBox(
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: BorderSide(color: Colors.white)),
+          color: Color(0xf272727),
+          onPressed: () {
+          },
+          child: Text(
+            "Weiter",
+            style: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 28,
+                color: Colors.white),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        ),
+      );
+    else
+      return SizedBox(
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: BorderSide(color: Colors.white)),
+          color: Color(0xf272727),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NewUserMotorradModell(MarkeController.text)),
+            );
+
+          },
+          child: Text(
+            "Weiter",
+            style: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 28,
+                color: Colors.white),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        ),
+      );
+  }
+void _onPressed() {
+if(MarkenController.text != "")
+  _updateMotorradSontiges(MarkenController.text);
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => NewUserMotorradSonstiges(MarkenController.text)),
+  );
+
+
+}
 
 }

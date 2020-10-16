@@ -1,6 +1,11 @@
 List<Map<String, String>> codes = [
   {
-    "name": "1050\1090 Adventure",
+    "name": "Auswählen",
+    "code": "AJ",
+    "dial_code": "01",
+  },
+  {
+    "name": "1050-1090 Adventure",
     "code": "UN",
     "dial_code": "01",
   },

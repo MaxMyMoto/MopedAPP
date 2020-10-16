@@ -7,9 +7,16 @@ final databaseReference = Firestore.instance;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class NewUserMotorradBaujahr extends StatefulWidget {
+  final String MotoMarke;
+  final String MotoModell;
+  // ignore: non_constant_identifier_names
+  NewUserMotorradBaujahr(this.MotoMarke,this.MotoModell);
+
   @override
-  _NewUserMotorradBaujahrState createState() { _NewUserMotorradBaujahrState();}
+  _NewUserMotorradBaujahrState createState() => _NewUserMotorradBaujahrState();
 }
+
+
 
 class _NewUserMotorradBaujahrState extends State<NewUserMotorradBaujahr> {
   FirebaseUser user;
@@ -108,6 +115,71 @@ class _NewUserMotorradBaujahrState extends State<NewUserMotorradBaujahr> {
     );
 
   }
+  Widget _buildKetting(BuildContext context) {
+    return new StreamBuilder(
+        stream: Firestore.instance.collection('Users')
+            .document(user.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return new Text("Loading");
+          }
+          var userDocument = snapshot.data;
+          return new Padding(padding:EdgeInsets.only(left: 30, right: 30),
+              child:
+              Center(child:
+              _WeiterButton(userDocument['MotorradBaujahr']),
+              )
+          );
+        });
+  }
+
+  Widget _WeiterButton(String string) {
+    if(string == "/" || string == "Auswählen")
+      return SizedBox(
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: BorderSide(color: Colors.white)),
+          color: Color(0xf272727),
+          onPressed: () {
+          },
+          child: Text(
+            "Weiter",
+            style: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 28,
+                color: Colors.white),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        ),
+      );
+    else
+      return SizedBox(
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: BorderSide(color: Colors.white)),
+          color: Color(0xf272727),
+          onPressed: () {
+            _updateUserStatus();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+
+          },
+          child: Text(
+            "Weiter",
+            style: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 28,
+                color: Colors.white),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        ),
+      );
+  }
 
   Widget _buildSetting(BuildContext context) {
     return new StreamBuilder(
@@ -128,26 +200,14 @@ class _NewUserMotorradBaujahrState extends State<NewUserMotorradBaujahr> {
         });
   }
 
-  void _getMarkeModell() async{
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
-    Firestore.instance.collection("Users").document(firebaseUser.uid).get().then((value){
-      ModellController.text = value.data['MotorradModell'.toString()];
-      MarkeController.text = value.data['MotorradMarke'.toString()];
-    });
-  }
+
   Widget _buildTetting(BuildContext context) {
-   return new StreamBuilder(
-      stream: Firestore.instance.collection("Users").document(user.uid).snapshots(),
-      builder: (context, snapshot1){
-        var userDocument1 = snapshot1.data;
-        if (!snapshot1.hasData) {
-          return new Text("Loading");
-        }
+
         return new StreamBuilder(
             stream: Firestore.instance.collection('Motorräder')
-                .document(userDocument1['MotorradMarke'.toString()])
+                .document(widget.MotoMarke.toString())
                 .collection('Modelle')
-                .document(userDocument1['MotorradModell'.toString()])
+                .document(widget.MotoModell.toString())
                 .snapshots(),
             builder: (context, snapshot2) {
               if (!snapshot2.hasData) {
@@ -156,617 +216,387 @@ class _NewUserMotorradBaujahrState extends State<NewUserMotorradBaujahr> {
               var userDocument = snapshot2.data;
               if (userDocument['N'] == 1.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 2.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 3.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 4.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 5.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 6.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 6']),
+                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 7.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 6']),
+                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 7']),
+                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 8.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 6']),
+                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 7']),
+                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 8']),
+                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 9.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 6']),
+                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 7']),
+                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 8']),
+                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 9']),
+                      child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 10.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 10'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 6']),
+                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 7']),
+                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 8']),
+                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 9']),
+                      child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 10']),
+                      child: Text(userDocument['Baujahr 10'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
               if (userDocument['N'] == 11.toString())
                 return new ListView(children: <Widget>[
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 10'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-                  Container(
-                      height: 50,
-                      color: Colors.black,
-                      child: Text(userDocument['Baujahr 11'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
+                  Container(height: 50,
+                  color: Colors.transparent,
+                  child: FlatButton(
+                      onPressed: () => updateBaujahr(userDocument['Baujahr 1']),
+                      child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 2']),
+                      child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 3']),
+                      child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 4']),
+                      child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 5']),
+                      child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 6']),
+                      child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 7']),
+                      child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 8']),
+                      child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+              Container(height: 50,
+              color: Colors.transparent,
+              child: FlatButton(
+                  onPressed: () => updateBaujahr(userDocument['Baujahr 9']),
+                      child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 10']),
+                      child: Text(userDocument['Baujahr 10'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
+                  Container(height: 50,
+                    color: Colors.transparent,
+                    child: FlatButton(
+                        onPressed: () => updateBaujahr(userDocument['Baujahr 11']),
+                      child: Text(userDocument['Baujahr 11'].toString(), style: TextStyle(color: Colors.black, fontFamily: 'Texgyreadventors'),)),),
                 ],);
             });
       }
+      
+  void updateBaujahr(String string) async {
+
+    final FirebaseUser user = await _auth.currentUser();
+    final uid = user.uid;
+
+
+    await databaseReference.collection("Users")
+        .document(uid)
+        .updateData({
+
+      'MotorradBaujahr': string,
+    }
     );
+    Navigator.pop(context);
+
   }
 
-  Widget _buildRetting(BuildContext context) {
-    return new StreamBuilder(
-        stream: Firestore.instance.collection('Motorräder')
-            .document(MarkeController.toString())
-        .collection('Modelle')
-        .document(ModellController.toString())
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return new Text("Loading");
-          }
-          var userDocument = snapshot.data;
-         if (userDocument['N'] == 1.toString())
-           return new ListView(children: <Widget>[
-             Container(
-                 height: 50,
-                 color: Colors.black,
-                 child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-           ],);
-          if (userDocument['N'] == 2.toString())
-          return new ListView(children: <Widget>[
-            Container(
-                height: 50,
-                color: Colors.black,
-                child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            Container(
-                height: 50,
-                color: Colors.black,
-                child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-          ],);
-          if (userDocument['N'] == 3.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 4.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 5.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 6.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 7.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 8.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 9.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 10.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 10'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-          if (userDocument['N'] == 11.toString())
-            return new ListView(children: <Widget>[
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 1'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 2'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 3'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 4'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 5'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 6'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 7'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 8'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 9'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 10'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-              Container(
-                  height: 50,
-                  color: Colors.black,
-                  child: Text(userDocument['Baujahr 11'].toString(), style: TextStyle(color: Colors.white, fontFamily: 'Texgyreadventors'),)),
-            ],);
-        });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -821,31 +651,8 @@ class _NewUserMotorradBaujahrState extends State<NewUserMotorradBaujahr> {
             SizedBox(
               height: (kToolbarHeight / 2),
             ),
-            Center(
-              child: SizedBox(
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.white)),
-                  color: Color(0xf272727),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                    _updateUserStatus();
-                  },
-                  child: Text(
-                    "Weiter",
-                    style: TextStyle(
-                        fontFamily: 'texgyreadventors',
-                        fontSize: 28,
-                        color: Colors.white),
-                  ),
-                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                ),
-              ),
-            )
+            user != null ? _buildKetting(context) : Text(
+                "Error: $error"),
           ],
         )),
       )

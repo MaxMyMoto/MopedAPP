@@ -1,5 +1,9 @@
 List<Map<String, String>> codes = [
   {
+    "name": "Auswählen",
+    "code": "AJ",
+    "dial_code": "+93",
+  },{
     "name": "Ducati",
     "code": "DU",
     "dial_code": "01",

@@ -22,12 +22,17 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 
 class NewUserMotorradModell extends StatefulWidget {
+  final String MotorradMarke;
+  // ignore: non_constant_identifier_names
+  NewUserMotorradModell(this.MotorradMarke);
+
   @override
   _NewUserMotorradModellState createState() => _NewUserMotorradModellState();
 }
 
 class _NewUserMotorradModellState extends State<NewUserMotorradModell> {
   final MarkeController = TextEditingController();
+  final ModellController = TextEditingController();
   FirebaseUser user;
   String error;
   //.
@@ -58,6 +63,9 @@ class _NewUserMotorradModellState extends State<NewUserMotorradModell> {
     MarkeController.dispose();
     super.dispose();
 
+    ModellController.dispose();
+    super.dispose();
+
 
   }
 
@@ -75,37 +83,39 @@ class _NewUserMotorradModellState extends State<NewUserMotorradModell> {
         .updateData({
 
       'MotorradModell': string,
-
-
-
-    });
-
+    }
+    );
+    ModellController.text = string;
   }
 
 Widget _ModellAuswahl(String string){
+    MarkeController.text = string;
     if (string == 'Yamaha')
       return new YamahaCodePicker(
+        initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyYamahaWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showYamahaOnly: true, //eg. 'GBP'
           onChanged: (e) {
             _updateModellData(e.toYamahaStringOnly());}
       );
     if (string == 'Ducati')
       return new DucatiCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyDucatiWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showDucatiOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toDucatiStringOnly());}
       );
     if (string == 'Honda')
       return new HondaCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyHondaWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showHondaOnly: true, //eg. 'GBP'
    onChanged: (e) {
   _updateModellData(e.toHondaStringOnly());}
@@ -113,81 +123,90 @@ Widget _ModellAuswahl(String string){
       );
     if (string == 'Suzuki')
       return new SuzukiCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlySuzukiWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showSuzukiOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toSuzukiStringOnly());}
       );
     if (string == 'Kawasaki')
       return new KawasakiCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyKawasakiWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showKawasakiOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toKawasakiStringOnly());}
       );
     if (string == 'BMW')
       return new BmwCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyBmwWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showBmwOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toBmwStringOnly());}
       );
     if (string == 'KTM')
       return new KtmCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyKtmWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showKtmOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toKtmStringOnly());}
       );
     if (string == 'Harley Davidson')
       return new HarleydavidsonCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyHarleydavidsonWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showHarleydavidsonOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toHarleydavidsonStringOnly());}
       );
     if (string == 'Triumph')
       return new TriumphCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyTriumphWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showTriumphOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toTriumphStringOnly());}
       );
     if (string == 'Aprilia')
       return new ApriliaCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyApriliaWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showApriliaOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toApriliaStringOnly());}
       );
     if (string == 'Husqvarna')
       return new HusqvarnaCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyHusqvarnaWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showHusqvarnaOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toHusqvarnaStringOnly());}
       );
     if (string == 'MV Agusta')
       return new MvaCodePicker(
+          initialSelection: ('Auswählen'),
         textStyle: TextStyle(fontFamily: 'texgyreadventors', fontSize: 22, color: Colors.white),
         showOnlyMvaWhenClosed: true,
-        showLogo: false,
+        showLogo: true,
         showMvaOnly: true, //eg. 'GBP'
   onChanged: (e) {
   _updateModellData(e.toMvaStringOnly());}
@@ -241,36 +260,78 @@ Widget _ModellAuswahl(String string){
             SizedBox(
               height: (kToolbarHeight / 2),
             ),
-            Center(
-              child: SizedBox(
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.white)),
-                  color: Color(0xf272727),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NewUserMotorradBaujahr()),
-                    );
-
-                  },
-                  child: Text(
-                    "Weiter",
-                    style: TextStyle(
-                        fontFamily: 'texgyreadventors',
-                        fontSize: 28,
-                        color: Colors.white),
-                  ),
-                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                ),
-              ),
-            )
+            user != null ? _buildKetting(context) : Text(
+                "Error: $error"),
           ],
         )),
       )
       ,
     );
+  }
+
+  Widget _buildKetting(BuildContext context) {
+    return new StreamBuilder(
+        stream: Firestore.instance.collection('Users')
+            .document(user.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return new Text("Loading");
+          }
+          var userDocument = snapshot.data;
+          return new Padding(padding:EdgeInsets.only(left: 30, right: 30),
+              child:
+              Center(child:
+              _WeiterButton(userDocument['MotorradModell']),
+              )
+          );
+        });
+  }
+
+  Widget _WeiterButton(String string) {
+    if(string == "/" || string == "Auswählen")
+      return SizedBox(
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: BorderSide(color: Colors.white)),
+          color: Color(0xf272727),
+          onPressed: () {
+          },
+          child: Text(
+            "Weiter",
+            style: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 28,
+                color: Colors.white),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        ),
+      );
+    else
+     return SizedBox(
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: BorderSide(color: Colors.white)),
+          color: Color(0xf272727),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NewUserMotorradBaujahr(widget.MotorradMarke, ModellController.text)),
+            );
+
+          },
+          child: Text(
+            "Weiter",
+            style: TextStyle(
+                fontFamily: 'texgyreadventors',
+                fontSize: 28,
+                color: Colors.white),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        ),
+      );
   }
 
   Widget _buildSetting(BuildContext context) {

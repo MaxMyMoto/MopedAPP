@@ -21,7 +21,6 @@ class MyMoto extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     return MaterialApp(
-      title: 'Flutter Login',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -29,4 +28,3 @@ class MyMoto extends StatelessWidget {
     );
   }
 }
-
